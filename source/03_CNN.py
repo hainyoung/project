@@ -31,8 +31,15 @@ print("y_test.shape :", y_test.shape)    # (40, 2)
 
 # 데이터 전처리
 # scaling(하기 전, 다시 2차원으로 reshape 해 줘야 함)
+
+# 64 x 64
 x_train = x_train.reshape(x_train.shape[0], 64*64*3)
 x_test = x_test.reshape(x_test.shape[0], 64*64*3)
+
+# 100 x 100
+# x_train = x_train.reshape(x_train.shape[0], 100*100*3)
+# x_test = x_test.reshape(x_test.shape[0], 100*100*3)
+
 
 scaler = MinMaxScaler()
 scaler.fit(x_train)
@@ -43,8 +50,14 @@ x_test = scaler.transform(x_test)
 
 
 # CNN 모델에 맞게 reshape
+# 64 x 64
 x_train = x_train.reshape(x_train.shape[0], 64, 64, 3)
 x_test = x_test.reshape(x_test.shape[0], 64, 64, 3)
+
+# 100 x 100
+# x_train = x_train.reshape(x_train.shape[0] ,100, 100, 3)
+# x_test = x_test.reshape(x_test.shape[0], 100, 100, 3)
+
 
 print("x_train.shape :", x_train.shape)
 
@@ -54,14 +67,14 @@ print("x_train.shape :", x_train.shape)
 input1 = Input(shape = (64, 64, 3))
 dense1 = Conv2D(50, (2, 2))(input1)
 dense2 = Dropout(0.2)(dense1)     
-dense3 = Conv2D(100, (3, 3), activation = 'relu')(dense2)
+dense3 = Conv2D(100, (3, 3))(dense2)
 dense4 = Dropout(0.2)(dense3)     
 
-dense5 = Conv2D(150, (3, 3) , padding = 'same', activation = 'relu')(dense4)   
+dense5 = Conv2D(150, (3, 3) , padding = 'same')(dense4)   
 dense6 = MaxPooling2D(pool_size = 2)(dense5)
 dense7 = Dropout(0.3)(dense6)          
 
-dense8 = Conv2D(30, (2, 2), padding = 'same', activation = 'relu')(dense7)
+dense8 = Conv2D(30, (2, 2), padding = 'same')(dense7)
 dense9 = MaxPooling2D(pool_size = 2)(dense8)
 dense10 = Dropout(0.1)(dense9)
 

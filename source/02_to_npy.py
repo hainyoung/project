@@ -11,14 +11,14 @@ from keras.layers import Input, Conv2D, MaxPooling2D, Flatten, Dense, Dropout
 from keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard
 
 # 준비한 이미지 numpy dataset 만들기
-groups_folder_path = './eyes/'
-categories = ["c_eyes", "o_eyes"]
+groups_folder_path = './eyes/'     # dataset으로 사용할 파일들의 가장 상위폴더 지정
+categories = ["c_eyes", "o_eyes"]  # y data의 카테고리 지정
 
 num_classes = len(categories)
+print(num_classes) # 2
 
-print(type(categories))
-
-x = []
+# x, y data준비
+x = [] # 빈 리스트
 y = []
 
 for index, categorie in enumerate(categories) :
@@ -36,9 +36,14 @@ for index, categorie in enumerate(categories) :
 x = np.array(x)
 y = np.array(y)
 
+# 64 x 64
 print("x.shape :", x.shape)   # (200, 64, 64, 3)
 print("y.shape :", y.shape)   # (200, 2)
  
+# print("x.shape :", x.shape)   # (200, 100, 100, 3)
+# print("y.shape :", y.shape)   # (200, 2)
+ 
+# numpy로 최종 저장
 np.save('./data/x_data.npy', x)
 np.save('./data/y_data.npy', y)
 
