@@ -25,9 +25,9 @@ imc = Image.open(imc_path) # 특정한 이미지 경로를 통해 해당 이미�
 
 # format()을 사용한 문자열 formatting(포맷팅)을 사용
 
-print('{}'.format(imc.format)) # 지정해 둔 변수, 이미지의 형식 출력
-print('size : {}'.format(imc.size)) # 이미지 사이즈 출력
-print('image mode : {}'.format(imc.mode)) # 이미지의 색상 모드 출력 
+# print('{}'.format(imc.format)) # 지정해 둔 변수, 이미지의 형식 출력
+# print('size : {}'.format(imc.size)) # 이미지 사이즈 출력
+# print('image mode : {}'.format(imc.mode)) # 이미지의 색상 모드 출력 
 
 # imc.show()
 '''
@@ -80,9 +80,9 @@ for (i, new) in enumerate(resized_close) :
 imo_path = './img/open/oe1.jpg'
 
 imo = Image.open(imo_path)
-print('{}'.format(imo.format))
-print('size : {}'.format(imo.size))
-print('image mode : {}'.format(imo.mode))
+# print('{}'.format(imo.format))
+# print('size : {}'.format(imo.size))
+# print('image mode : {}'.format(imo.mode))
 # imo.show()
 
 # '''
@@ -131,128 +131,147 @@ groups_folder_path = './eyes/'     # dataset으로 사용할 파일들의 가장
 categories = ["c_eyes", "o_eyes"]  # 
 
 num_classes = len(categories)
-print(num_classes) # 2
+# print(num_classes) # 2
 
-# # x, y data준비
-# x = [] # 빈 리스트
-# y = []
+# x, y data준비
+x = [] # 빈 리스트
+y = []
 
-# for index, categorie in enumerate(categories) :
-#     label = [0 for i in range(num_classes)]
-#     label[index] = 1
-#     image_dir = groups_folder_path + categorie + '/'
+# 라벨링 코드 분석
+for index, categorie in enumerate(categories) :
+    # print(index) 
+    
+    # 0
+    # 1
+    
+    label = [0 for i in range(num_classes)]
+    # print(label)
+    # [0, 0]
+    # [0, 0]
+    
+    label[index] = 1
+    # print(label)
+    # [1, 0]
+    # [0, 1]
+    
+    image_dir = groups_folder_path + categorie + '/'
+    # print(image_dir)
+    # ./eyes/c_eyes/
+    # ./eyes/o_eyes/
 
-#     for top, dir, f in os.walk(image_dir) :
-#         for filename in f :
-#             print(image_dir + filename)
-#             img = cv2.imread(image_dir+filename)
-#             x.append(img)
-#             y.append(label)
 
-# x = np.array(x)
-# y = np.array(y)
+    for path, dirs, files in os.walk(image_dir) : 
+        # path : dir과 files가 있는 경로, dirs : path 아래에 있는 폴더, files : path 아래에 있는 파일들
+        # os.walk : 시작 디렉토리부터 하위 모든 디렉토리를 차례대로 방문 해주는 함수
+        for filename in files :
+            print(image_dir + filename) # 파일들의 경로 확인
+            img = cv2.imread(image_dir+filename) # img 라는 변수에 cv2를 이용해 이미지 파일들을 읽음
+            x.append(img)   # x에 읽은 이미지들을 append
+            y.append(label) # y에 label append
 
-# # 64 x 64
+
+# 이미지 파일을 numpy 로 변환
+x = np.array(x)
+y = np.array(y)
+
+# resize 64 x 64
 # print("x.shape :", x.shape)   # (200, 64, 64, 3)
 # print("y.shape :", y.shape)   # (200, 2)
- 
+
+# resize 100 x 100
 # # print("x.shape :", x.shape)   # (200, 100, 100, 3)
 # # print("y.shape :", y.shape)   # (200, 2)
  
-# # numpy로 최종 저장
-# np.save('./data/x_data.npy', x)
-# np.save('./data/y_data.npy', y)
-
-
+# numpy로 최종 저장
+np.save('./data/x_data.npy', x)
+np.save('./data/y_data.npy', y)
 
 
 
 
 # # CNN
-# import numpy as np
-# import matplotlib.pyplot as plt
+import numpy as np
+import matplotlib.pyplot as plt
 
-# from sklearn.model_selection import train_test_split
-# from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler, MaxAbsScaler
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler, MaxAbsScaler
 
-# from keras.models import Sequential, Model
-# from keras.layers import Input, Conv2D, MaxPooling2D, Flatten, Dense, Dropout
+from keras.models import Sequential, Model
+from keras.layers import Input, Conv2D, MaxPooling2D, Flatten, Dense, Dropout
 
-# from keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard
-
-
+from keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard
 
 
-# x = np.load('./data/x_data.npy')
-# y = np.load('./data/y_data.npy')
+x = np.load('./data/x_data.npy')
+y = np.load('./data/y_data.npy')
 
-# print("x.shape :", x.shape)
-# print("y.shape :", y.shape)
+print("x.shape :", x.shape)
+print("y.shape :", y.shape)
 
-# from sklearn.model_selection import train_test_split
-# x_train, x_test, y_train, y_test = train_test_split(
-#     x, y, test_size = 0.2, random_state = 77, shuffle = True
-# )
+from sklearn.model_selection import train_test_split
+x_train, x_test, y_train, y_test = train_test_split(
+    x, y, test_size = 0.2, random_state = 11, shuffle = True
+)
 
-# print("x_train.shape :", x_train.shape)  # (160, 64, 64, 3)
-# print("x_test.shape :", x_test.shape)    # (40, 64, 64, 3)
-# print("y_train.shape :", y_train.shape)  # (160, 2)
-# print("y_test.shape :", y_test.shape)    # (40, 2)
+print("x_train.shape :", x_train.shape)  # (160, 64, 64, 3)
+print("x_test.shape :", x_test.shape)    # (40, 64, 64, 3)
+print("y_train.shape :", y_train.shape)  # (160, 2)
+print("y_test.shape :", y_test.shape)    # (40, 2)
 
 
-# # 데이터 전처리
-# # scaling(하기 전, 다시 2차원으로 reshape 해 줘야 함)
+# 데이터 전처리
+# scaling(하기 전, 다시 2차원으로 reshape 해 줘야 함)
 
-# # 64 x 64
-# x_train = x_train.reshape(x_train.shape[0], 64*64*3)
-# x_test = x_test.reshape(x_test.shape[0], 64*64*3)
+# 64 x 64
+x_train = x_train.reshape(x_train.shape[0], 64*64*3)
+x_test = x_test.reshape(x_test.shape[0], 64*64*3)
 
 # # 100 x 100
 # # x_train = x_train.reshape(x_train.shape[0], 100*100*3)
 # # x_test = x_test.reshape(x_test.shape[0], 100*100*3)
 
 
-# scaler = MinMaxScaler()
-# scaler.fit(x_train)
-# x_train = scaler.transform(x_train)
-# x_test = scaler.transform(x_test)
+scaler = MinMaxScaler()
+scaler.fit(x_train)
+x_train = scaler.transform(x_train)
+x_test = scaler.transform(x_test)
 
-# # print(x_test)
+# print(x_test)
 
 
-# # CNN 모델에 맞게 reshape
-# # 64 x 64
-# x_train = x_train.reshape(x_train.shape[0], 64, 64, 3)
-# x_test = x_test.reshape(x_test.shape[0], 64, 64, 3)
+# CNN 모델에 맞게 reshape
+# 64 x 64
+x_train = x_train.reshape(x_train.shape[0], 64, 64, 3)
+x_test = x_test.reshape(x_test.shape[0], 64, 64, 3)
 
 # # 100 x 100
 # # x_train = x_train.reshape(x_train.shape[0] ,100, 100, 3)
 # # x_test = x_test.reshape(x_test.shape[0], 100, 100, 3)
 
 
-# print("x_train.shape :", x_train.shape)
+print("x_train.shape :", x_train.shape)
 
-# # 2. 모델 구성
+# 2. 모델 구성
 
-# ### 함수형 ###
-# input1 = Input(shape = (64, 64, 3))
-# dense1 = Conv2D(90, (2, 2))(input1)
-# dense2 = Dropout(0.2)(dense1)     
-# dense3 = Conv2D(100, (3, 3))(dense2)
-# dense4 = Dropout(0.2)(dense3)     
+### 함수형 ###
+input1 = Input(shape = (64, 64, 3))
+dense1 = Conv2D(90, (2, 2))(input1)
+dense2 = Dropout(0.2)(dense1)     
+dense3 = Conv2D(100, (3, 3))(dense2)
+dense4 = Dropout(0.2)(dense3)     
 
-# dense5 = Conv2D(150, (3, 3) , padding = 'same')(dense4)   
-# dense6 = MaxPooling2D(pool_size = 2)(dense5)
-# dense7 = Dropout(0.3)(dense6)          
+dense5 = Conv2D(150, (3, 3) , padding = 'same')(dense4)   
+dense6 = MaxPooling2D(pool_size = 2)(dense5)
+dense7 = Dropout(0.3)(dense6)          
 
-# dense8 = Conv2D(30, (2, 2), padding = 'same')(dense7)
-# dense9 = MaxPooling2D(pool_size = 2)(dense8)
-# dense10 = Dropout(0.1)(dense9)
+dense8 = Conv2D(30, (2, 2), padding = 'same')(dense7)
+dense9 = MaxPooling2D(pool_size = 2)(dense8)
+dense10 = Dropout(0.1)(dense9)
 
-# dense11 = Flatten()(dense10)
-# output1 = Dense(2, activation = 'softmax')(dense11)
+dense11 = Flatten()(dense10)
+output1 = Dense(2, activation = 'softmax')(dense11)
 
-# model = Model(inputs = input1, outputs = output1) 
+model = Model(inputs = input1, outputs = output1) 
 
 # # model.summary()
 
@@ -283,7 +302,8 @@ print(num_classes) # 2
 # cp = ModelCheckpoint(filepath = modelpath, monitor = 'acc', save_best_only = True, mode = 'auto')
 # # tb_hist = TensorBoard(log_dir = 'graph', histogram_freq = 0, write_graph = True, write_image = True)
 
-# model.compile(loss = 'binary_crossentropy', optimizer = 'adam', metrics = ['acc'])
+model.compile(loss = 'binary_crossentropy', optimizer = 'adam', metrics = ['acc'])
+model.fit(x_train, y_train, epochs = 100, batch_size = 10, validation_split = 0.3, verbose = 1)
 
 # # es + cp
 # model.fit(x_train, y_train, epochs = 300, batch_size = 10, validation_split = 0.3,verbose = 1, 
@@ -295,12 +315,12 @@ print(num_classes) # 2
 
 
 # # 4. 평가, 예측
-# loss, acc = model.evaluate(x_test, y_test, batch_size = 10)
+loss, acc = model.evaluate(x_test, y_test, batch_size = 10)
 
-# print("loss :", loss)
-# print("acc :", acc)
+print("loss :", loss)
+print("acc :", acc)
 
-# y_pred = model.predict(x_test)
+y_pred = model.predict(x_test)
 
-# print(np.argmax(y_pred, axis = 1))
+print(np.argmax(y_pred, axis = 1))
 # print(y_pred.shape)

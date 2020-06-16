@@ -9,12 +9,14 @@ from keras.layers import Input, Conv2D, MaxPooling2D, Flatten, Dense, Dropout
 
 from keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard
 
-# 데이터 불러오기
 x = np.load('./data/x_data.npy')
 y = np.load('./data/y_data.npy')
+x_pred = np.load('./data/x_pred.npy')
 
 print("x.shape :", x.shape)
 print("y.shape :", y.shape)
+print("x_pred.shape :", x_pred.shape)
+
 
 from sklearn.model_selection import train_test_split
 x_train, x_test, y_train, y_test = train_test_split(
@@ -38,7 +40,6 @@ x_test = x_test.reshape(x_test.shape[0], 64*64*3)
 # x_train = x_train.reshape(x_train.shape[0], 100*100*3)
 # x_test = x_test.reshape(x_test.shape[0], 100*100*3)
 
-
 scaler = MinMaxScaler()
 scaler.fit(x_train)
 x_train = scaler.transform(x_train)
@@ -46,57 +47,59 @@ x_test = scaler.transform(x_test)
 
 # print(x_test)
 
-print("x_train.shape :", x_train.shape) # (160, 12288)
+
+# CNN 모델에 맞게 reshape
+# 64 x 64
+x_train = x_train.reshape(x_train.shape[0], 64, 64, 3)
+x_test = x_test.reshape(x_test.shape[0], 64, 64, 3)
+
+# 100 x 100
+# x_train = x_train.reshape(x_train.shape[0] ,100, 100, 3)
+# x_test = x_test.reshape(x_test.shape[0], 100, 100, 3)
+
+
+print("x_train.shape :", x_train.shape)
 
 # 2. 모델 구성
 
 ### 함수형 ###
-input1 = Input(shape = (12288, ))
-x = Dense(100)(input1)
-x = Dense(110)(x)
-x = Dense(130)(x)
-x = Dense(150)(x)
-x = Dense(90)(x)
-x = Dense(300)(x)
-x = Dense(10)(x)
-output1 = Dense(2, activation = 'softmax')(x)
+input1 = Input(shape = (64, 64, 3))
+layer = Conv2D(90, (2, 2))(input1)
+layer = MaxPooling2D(pool_size = 2)(layer)
+layer = Dropout(0.2)(layer)     
 
+layer = Conv2D(100, (3, 3))(layer)
+layer = MaxPooling2D(pool_size = 2)(layer)
+layer = Dropout(0.2)(layer)     
+
+layer = Conv2D(150, (3, 3) , padding = 'same')(layer)   
+layer = MaxPooling2D(pool_size = 2)(layer)
+layer = Dropout(0.3)(layer)   
+
+layer = Conv2D(180, (3, 3) , padding = 'same')(layer)   
+layer = MaxPooling2D(pool_size = 2)(layer)
+layer = Dropout(0.3)(layer)       
+
+layer = Conv2D(30, (2, 2), padding = 'same')(layer)
+layer = MaxPooling2D(pool_size = 2)(layer)
+layer = Dropout(0.1)(layer)
+
+layer = Flatten()(layer)
+output1 = Dense(2, activation = 'sigmoid')(layer)
 
 model = Model(inputs = input1, outputs = output1) 
 
-# model.summary()
-
-### Sequential형 ###
-# model = Sequential()
-
-# model.add(Conv2D(50, (2, 2), input_shape = (64, 64, 3)))
-# model.add(Conv2D(70, (2, 2), padding = 'same'))
-# model.add(Dense(90))
-# model.add(Dropout(0.3))
-# model.add(MaxPooling2D(pool_size = 2))
-# model.add(Dense(100))
-# model.add(Dropout(0.3))
-# model.add(Dense(30))
-# model.add(MaxPooling2D(pool_size = 2))
-# model.add(Dense(20))
-# model.add(Dense(10))
-# model.add(Flatten())
-# model.add(Dense(2, activation = 'softmax'))
-
-# model.summary()
-
+model.summary()
 
 
 # 3. 컴파일, 훈련
-# es = EarlyStopping(monitor = 'loss', patience = 10, mode = 'auto')
-# modelpath = './model/{epoch:02d}--{acc:.4f}.hdf5'
-# cp = ModelCheckpoint(filepath = modelpath, monitor = 'acc', save_best_only = True, mode = 'auto')
+es = EarlyStopping(monitor = 'loss', patience = 10, mode = 'auto')
+modelpath = './model/{epoch:02d}--{acc:.4f}.hdf5'
+cp = ModelCheckpoint(filepath = modelpath, monitor = 'acc', save_best_only = True, mode = 'auto')
 # tb_hist = TensorBoard(log_dir = 'graph', histogram_freq = 0, write_graph = True, write_image = True)
 
 model.compile(loss = 'binary_crossentropy', optimizer = 'adam', metrics = ['acc'])
-
 model.fit(x_train, y_train, epochs = 100, batch_size = 10, validation_split = 0.3,verbose = 1)
-
 
 # es + cp
 # model.fit(x_train, y_train, epochs = 300, batch_size = 10, validation_split = 0.3,verbose = 1, 
@@ -109,11 +112,9 @@ model.fit(x_train, y_train, epochs = 100, batch_size = 10, validation_split = 0.
 
 # 4. 평가, 예측
 loss, acc = model.evaluate(x_test, y_test, batch_size = 10)
-
 print("loss :", loss)
 print("acc :", acc)
 
-y_pred = model.predict(x_test)
-
-print(np.argmax(y_pred, axis = 1))
-print(y_pred.shape)
+y_pred = model.predict(x_pred)
+# print(np.argmax(y_pred, axis = 1))
+print(y_pred)
