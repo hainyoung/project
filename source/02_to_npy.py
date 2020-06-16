@@ -1,4 +1,4 @@
-import os, re, glob
+import os, glob
 import cv2
 import numpy as np
 
@@ -39,7 +39,9 @@ y = np.array(y)
 # 64 x 64
 print("x.shape :", x.shape)   # (200, 64, 64, 3)
 print("y.shape :", y.shape)   # (200, 2)
- 
+
+
+# 100 x 100 
 # print("x.shape :", x.shape)   # (200, 100, 100, 3)
 # print("y.shape :", y.shape)   # (200, 2)
  
