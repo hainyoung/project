@@ -1,3 +1,4 @@
+
 from PIL import Image
 import numpy as np
 import glob
@@ -23,38 +24,17 @@ for i, f in enumerate(testimg) :
     imgname.append(image)
     x_pred.append(data)
 
-# print(testimg)
-
 x_pred = np.array(x_pred)
-
-# np.save('./data/x_pred.npy', arr = x_pred)
-# x_pred = np.load('./data/x_pred.npy')
 
 # 저장한 모델 사용
 model = load_model('./check/save/check--32--0.1243.hdf5')
 
-
 # 최종 예측
 prediction = model.predict(x_pred)
-# prediction = np.argmax(prediction, axis = 1)
-
-# print(prediction)
-
-# import tensorflow as tf
-# np.set_printoptions(formatter={'float' : lambda x:"{0.03f}}".format(x)})
-
-print()
-print()
-print()
-print()
-print()
-
-
 
 cnt = 0
 for i in prediction :
     result = i.argmax()
-    result_str = ""
     if result == 0 : result_str = "눈을 감고 있는 사진"
     else : result_str = "눈을 뜨고 있는 사진"
 
@@ -67,11 +47,6 @@ for i in prediction :
 
 
 
-print()
-print()
-print()
-print()
-print()
 
 
 # split("\\") : \ 기호를 기준으로 문자열을 나눠준다
@@ -79,3 +54,6 @@ print()
 #                          [0]   [1]
 # split("\\")[0] = ./img/test
 # split("\\")[1] = c1.jpg
+
+# np.save('./data/x_pred.npy', arr = x_pred)
+# x_pred = np.load('./data/x_pred.npy')

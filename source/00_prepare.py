@@ -11,28 +11,19 @@ close_list = []
 resized_close = []  
 # append images to list
 for filename in natsorted(glob.glob('./img/close/*.jpg')) :
-    print(filename) 
+    # print(filename) 
     imc = Image.open(filename) 
     close_list.append(imc)    
+
+
 # append resized images to list
 for imc in close_list :       
     imc = imc.resize((64, 64))
     resized_close.append(imc)  
-    print('size : {}'.format(imc.size))
+    # print('size : {}'.format(imc.size))
 # save resized images to new folder
 for (i, new) in enumerate(resized_close) :
     new.save ('{}{}{}'.format('./eyes/close/ce', i+1, '.jpg')) 
-
-
-
-
-
-
-
-
-
-
-
 
 
 # open eyes resize
@@ -53,15 +44,6 @@ for (i, new) in enumerate(resized_open) :
     new.save ('{}{}{}'.format('./eyes/open/oe', i+1, '.jpg'))
 
 
-
-
-
-
-
-
-
-
-
 # 2. 이미지 dataset 만들기
 groups_folder_path = './eyes/'     
 categories = ["close", "open"]  
@@ -71,18 +53,24 @@ print(num_classes) # 2
 x = []
 y = []
 
+
 for index, categorie in enumerate(categories) :
     label = [0 for i in range(num_classes)]
+    print(label)
     label[index] = 1
     image_dir = groups_folder_path + categorie + '/'
 
     for path, dirs, files in os.walk(image_dir) :
         for filename in files :
+            # print(filename)
             print(image_dir + filename)
             img = cv2.imread(image_dir+filename)
             x.append(img)
             y.append(label)
 
+
+
+'''
 x = np.array(x)
 y = np.array(y)
 
@@ -94,3 +82,4 @@ np.save('./data/x_data.npy', x)
 np.save('./data/y_data.npy', y)
 
 
+'''

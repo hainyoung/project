@@ -74,16 +74,18 @@ model.add(Dense(2, activation = 'sigmoid'))
 
 model.summary()
 
-# 3. 컴파일, 훈련
-# es = EarlyStopping(monitor = 'val_loss', patience = 10, mode = 'auto')
 
+# 3. 컴파일, 훈련
 modelpath = './check/check--{epoch:02d}--{val_loss:.4f}.hdf5'
 
-cp = ModelCheckpoint(filepath = modelpath, monitor = 'val_loss', save_best_only = True, mode = 'auto')
+cp = ModelCheckpoint(filepath = modelpath, monitor = 'val_loss', 
+                     save_best_only = True, mode = 'auto')
 
-model.compile(loss = 'binary_crossentropy', optimizer = 'adam', metrics = ['acc'])
+model.compile(loss = 'binary_crossentropy', optimizer = 'adam', 
+                                            metrics = ['acc'])
 
-hist = model.fit(x_train, y_train, epochs = 50, batch_size = 32, validation_split = 0.3, verbose = 1, callbacks = [cp])
+hist = model.fit(x_train, y_train, epochs = 50, batch_size = 32, 
+          validation_split = 0.3, verbose = 1, callbacks = [cp])
 
 
 
@@ -99,27 +101,33 @@ loss, acc = model.evaluate(x_test, y_test, batch_size = 32)
 print("LOSS :", loss)
 print("ACC :", acc)
 
-# 시각화
 
+# 시각화
 plt.figure(figsize = (12, 10))
 
 plt.subplot(2, 1, 1)
-plt.plot(hist.history['loss'], marker = 'o', c = 'red', label = 'loss')
-plt.plot(hist.history['val_loss'], marker = 'o', c = 'blue', label = 'val_loss')
+plt.plot(hist.history['loss'], marker = 'o', 
+                   c = 'red', label = 'loss')
+plt.plot(hist.history['val_loss'], marker = 'o', 
+                 c = 'blue', label = 'val_loss')
 plt.grid()
 plt.title('Training and Val loss')
 plt.ylabel('loss')
 plt.xlabel('epoch')
-plt.legend(['Training loss', 'Val loss'], loc = 'upper right')
+plt.legend(['Training loss', 'Val loss'], 
+                     loc = 'upper right')
 
 plt.subplot(2, 1, 2)
-plt.plot(hist.history['acc'], marker = 'o', c = 'purple', label = 'acc' )
-plt.plot(hist.history['val_acc'], marker = 'o', c = 'green', label = 'val_loss')
+plt.plot(hist.history['acc'], marker = 'o', 
+              c = 'purple', label = 'acc' )
+plt.plot(hist.history['val_acc'], marker = 'o', 
+               c = 'green', label = 'val_loss')
 plt.grid()
 plt.title('Training and Val accuracy')
 plt.ylabel('acc')
 plt.xlabel('epoch')
-plt.legend(['Training acc', 'Val acc'], loc = 'upper left')
+plt.legend(['Training acc', 'Val acc'], 
+                    loc = 'upper left')
 
 plt.show()
 

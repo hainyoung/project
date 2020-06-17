@@ -3,8 +3,32 @@
 
 00 Prepare : 데이터 준비
 from PIL import Image
+- 파이썬에서 이미지를 처리하고 핸들링 하기 위해서는 Pillow OpenCV, PIL 등의 외부 패키지를 설치해서 사용한다
+- Pillow 패키지 사용하기 위해 pip install Pillow
+- Pillow는 파이썬의 이미징 라비르러리로서 여러 이미지 파일 포맷을 지원한다
+- 그리고 이미지 내부 데이터에 접근 가능하게 하며 다양한 이미지 처리 기능을 제공한다
+- 예를 들어, 이 패키지를 사용하면 이미지로부터 Thumbnail 이미지를 만든다거나
+- 다른 이미지 포맷으로 변환할 수 있고 이미지를 출력하는 일들을 할 수 있다
+- 또한 이미지 크기를 변형하거나 회전 및 변형, 필터링 등 다양한 이미지 프로세싱 작업 가능
+
+- Pillow 패키지에서 가장 중요한 클래스는 이미지를 표현하는 Image 클래스이다
+- Image.open() 메서드는 기존 이미지 파일을 열 때 사용
+- Image.new() 메서드는 새로운 이미지 파일을 생성할 때 사용
+- Image.save() 메서드는 이미지 파일을 저장할 때
+
+
 import glob
+- 많은 파일들을 다뤄야 하는 파이썬 프로그램을 작성할 때
+- 특정 패턴이나 확장자를 가진 파일들의 경로나 이름이 필요할 때가 있다
+- glob 모듈의 glob 함수는 사용자가 제시한 조건에 맞는 파일명을 리스트 형식으로 반환한다
+- glob 으로 파일 리스트를 가져올 경우에는 파일명뿐만 아니라 경로명까지 함께 가져 온다
+
 from natsort import natsorted
+- 기본 라이브러리가 아님, pip install natsort로 설치
+- 숫자가 포함된 파일들을 숫자 순서로 정렬
+- ex) 1, 10, 100, 11, 12, ..., 19, 2, 20, 21, ... 이런 식으로 정렬되는 것을
+- 1, 2, 3, 4, ...., 19, 20, 21, ...100 이렇게 숫자 순서로 정렬 시켜 준다
+- 파일 탐색기처럼 자연스럽게 정렬해준다고 보면 됨
 
 import numpy as np
 
@@ -14,17 +38,30 @@ close_list = []
 resized_close = []  
 # append images to list
 for filename in natsorted(glob.glob('./img/close/*.jpg')) :
+# glob.glob를 통해 img/close/ 경로에 있는 모든 jpg 파일을 호출
+# for문을 돌면서 하나의 리스트로 생성
     print(filename) 
     imc = Image.open(filename) 
-    close_list.append(imc)    
+    close_list.append(imc)   
+    
 # append resized images to list
+# for문을 통해 위에서 생성된 리스트의 이미지들을 하나씩 호출해
+# 동일한 사이즈로 맞춰준다
+# 64x64 
+
 for imc in close_list :       
-    imc = imc.resize((100, 100))
+    imc = imc.resize((64, 31))
     resized_close.append(imc)  
     print('size : {}'.format(imc.size))
+# formatting 포맷팅 방법 중 하나
+
+
 # save resized images to new folder
+
 for (i, new) in enumerate(resized_close) :
     new.save ('{}{}{}'.format('./eyes/close/ce', i+1, '.jpg')) 
+# 리사이즈 된 이미지 리스트들을 새로운 폴더에 저장
+
 
 # open eyes resize
 open_list = []
@@ -36,17 +73,23 @@ for filename in natsorted(glob.glob('./img/open/*.jpg')) :
     open_list.append(imo)
 
 for imo in open_list :
-    imo = imo.resize((100, 100))
+    imo = imo.resize((64, 64))
     resized_open.append(imo)
     # print('size : {}'.format(imo.size))
 
 for (i, new) in enumerate(resized_open) :
     new.save ('{}{}{}'.format('./eyes/open/oe', i+1, '.jpg'))
 
+# i는 파일명에 숫자를 부여하기 위해서 들어가 있는 것
+# new는 resized_open 리스트에 있는 값들, 즉 이미지 데이터의 변수명
+# new.save : 리사이즈 된 이미지들을 새로운 곳에 저장
 
-# 2. 이미지 데이터화
+
+# 2. 이미지 데이터세트 만들기
+
 groups_folder_path = './eyes/'     
 categories = ["close", "open"]  
+# 카테고리를 폴더명으로 지정
 num_classes = len(categories)
 print(num_classes) # 2
 
@@ -57,8 +100,24 @@ import os
 import cv2
 
 for index, categorie in enumerate(categories) :
+# enumerate : range와 비슷한 개념인데, for문처럼 반복되는 구간에
+# 객체가 어느 위치에 있는지 알려주는 인덱스값이 필요할 때 사용하는 함수
+# 리스트가 있는 경우, 순서와 리스트 값을 전달하는 기능
+
+
+print(type(0 for i in range(num_classes))) # <class 'generator'>
+응?? generator가 왜 나와
+for문처럼 보이는데 ':'이 없어서 이상해서
+type print 하니까 generator 등장
+generator는 간단하게 설명하면 배열이나 리스트와 같은 반복가능한
+연속적인 값들을 생성해내는 패턴
+중요한 점 : 모든 값을 포함하여 반환하는 대신 호출 할 때마다 한 개의 값을 리턴
+잘 모르겠다 -> 학원 가서 딥러닝 교과서에서 한 번 찾아보자
+
     label = [0 for i in range(num_classes)]
+    # print [0, 0] [0, 0]
     label[index] = 1
+    # print [1, 0] [0, 1]
     image_dir = groups_folder_path + categorie + '/'
 
     for path, dirs, files in os.walk(image_dir) :
@@ -68,6 +127,13 @@ for index, categorie in enumerate(categories) :
             x.append(img)
             y.append(label)
 
+# label 생성 과정
+for문 1차
+[0, 0]
+[1, 0]
+for문 2차
+[0, 0]
+[0, 1]
 
 x = np.array(x)
 y = np.array(y)
@@ -120,8 +186,8 @@ print("y_test.shape :", y_test.shape)    # (40, 2)
 
 
 # Scaling 하기 위해 Reshape
-x_train = x_train.reshape(x_train.shape[0], 100*100*3)
-x_test = x_test.reshape(x_test.shape[0], 100*100*3)
+x_train = x_train.reshape(x_train.shape[0], 64*64*3)
+x_test = x_test.reshape(x_test.shape[0], 64*64*3)
 
 # MinMaxScaler
 scaler = MinMaxScaler()
@@ -130,8 +196,8 @@ x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
 
 # CNN 모델에 맞게 Reshape
-x_train = x_train.reshape(x_train.shape[0], 100, 100, 3)
-x_test = x_test.reshape(x_test.shape[0], 100, 100, 3)
+x_train = x_train.reshape(x_train.shape[0], 64, 64, 3)
+x_test = x_test.reshape(x_test.shape[0], 64, 64, 3)
 
 
 # 2. 모델 구성
@@ -139,7 +205,7 @@ x_test = x_test.reshape(x_test.shape[0], 100, 100, 3)
 model = Sequential()
 
 #1
-model.add(Conv2D(64, (2, 2), activation = 'relu', input_shape = (100, 100, 3))) 
+model.add(Conv2D(64, (2, 2), activation = 'relu', input_shape = (64, 64, 3))) 
 model.add(MaxPooling2D(pool_size = 2))
 model.add(Dropout(0.25))
 #2
@@ -168,37 +234,19 @@ model.summary()
 
 
 # 3. 컴파일, 훈련
-# es = EarlyStopping(monitor = 'val_loss', patience = 10, mode = 'auto')
 modelpath = './check/check--{epoch:02d}--{val_loss:.4f}.hdf5'
 cp = ModelCheckpoint(filepath = modelpath, monitor = 'val_loss', save_best_only = True, mode = 'auto')
-# tb_hist = TensorBoard(log_dir = 'graph', histogram_freq = 0, write_graph = True, write_images = True)
 
 model.compile(loss = 'binary_crossentropy', optimizer = 'adam', metrics = ['acc'])
 
-hist = model.fit(x_train, y_train, epochs = 100, batch_size = 32, validation_split = 0.3, verbose = 1)
-
-# hist = model.fit(x_train, y_train, epochs = 50, batch_size = 32, validation_split = 0.3, verbose = 1, callbacks = [cp])
+hist = model.fit(x_train, y_train, epochs = 50, batch_size = 32, validation_split = 0.3, verbose = 1, callbacks = [cp])
                                   
 
 
-# 4. 평가, 예측
+# 4. 평가
 loss, acc = model.evaluate(x_test, y_test, batch_size = 32)
 print("LOSS :", loss)
 print("ACC :", acc)
-
-prediction = model.predict(x_pred)
-prediction = np.argmax(prediction, axis = 1)
-
-
-# for i in prediction :
-#     if i == 0 :
-#         print("눈을 감고 있습니다zZ")
-#         print("-------------------")
-#     else :
-#         print("눈빛이 살아 있습니다")
-#         print("-------------------")
-
-
 
 # 시각화
 
@@ -271,12 +319,8 @@ prediction = model.predict(x_pred)
 
 # print(prediction)
 
-# import tensorflow as tf
-# np.set_printoptions(formatter={'float' : lambda x:"{0.03f}}".format(x)})
-
 
 cnt = 0
-
 for i in prediction :
     result = i.argmax()
     result_str = ""
