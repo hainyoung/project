@@ -5,22 +5,9 @@ import os
 import cv2
 import numpy as np
 
-##################################### 이미지 리사이즈
-################ 1. closed eyes resize
-# display image characteristics
-imc_path = './img/close/ce1.jpg' 
-imc = Image.open(imc_path) 
-print('{}'.format(imc.format)) 
-print('size : {}'.format(imc.size))
-print('image mode : {}'.format(imc.mode))
-imc.show()
-'''
-JPEG
-size : (852, 480)
-image mode : RGB
-'''
-# close_eyes image resize
-# empty lists
+# 1. 이미지 리사이즈
+
+# closed eyes resize
 close_list = []    
 resized_close = []  
 # append images to list
@@ -30,15 +17,14 @@ for filename in natsorted(glob.glob('./img/close/*.jpg')) :
     close_list.append(imc)    
 # append resized images to list
 for imc in close_list :       
-    imc = imc.resize((64, 64))
+    imc = imc.resize((100, 100))
     resized_close.append(imc)  
     print('size : {}'.format(imc.size))
 # save resized images to new folder
 for (i, new) in enumerate(resized_close) :
-    new.save ('{}{}{}'.format('./eyes/c_eyes/ce', i+1, '.jpg')) 
+    new.save ('{}{}{}'.format('./eyes/close/ce', i+1, '.jpg')) 
 
-################ 2. open eyes resize
-# empty lists
+# open eyes resize
 open_list = []
 resized_open = []
 
@@ -48,40 +34,17 @@ for filename in natsorted(glob.glob('./img/open/*.jpg')) :
     open_list.append(imo)
 
 for imo in open_list :
-    imo = imo.resize((64, 64))
+    imo = imo.resize((100, 100))
     resized_open.append(imo)
     # print('size : {}'.format(imo.size))
 
 for (i, new) in enumerate(resized_open) :
-    new.save ('{}{}{}'.format('./eyes/o_eyes/oe', i+1, '.jpg'))
+    new.save ('{}{}{}'.format('./eyes/open/oe', i+1, '.jpg'))
 
 
-
-############# x_pred(open eyes)
-imt_path = './img/test/test1.jpg' 
-imt = Image.open(imt_path) 
-
-test_list = []    
-resized_test = []  
-
-for filename in natsorted(glob.glob('./img/test/*.jpg')) :
-    print(filename) 
-    imt = Image.open(filename) 
-    test_list.append(imt)    
-
-for imt in test_list :       
-    imt = imt.resize((64, 64))
-    resized_test.append(imt)  
-    # print('size : {}'.format(imt.size))
-
-for (i, new) in enumerate(resized_test) :
-    new.save ('{}{}{}'.format('./data/test_face/tf', i+1, '.jpg')) 
-      
-
-######################## NUMPY conversion
-# numpy type dataset
+# 2. 이미지 
 groups_folder_path = './eyes/'     
-categories = ["c_eyes", "o_eyes"]  
+categories = ["close", "open"]  
 num_classes = len(categories)
 print(num_classes) # 2
 
@@ -100,13 +63,55 @@ for index, categorie in enumerate(categories) :
             x.append(img)
             y.append(label)
 
+
 x = np.array(x)
 y = np.array(y)
 
-# 64 x 64
 print("x.shape :", x.shape)   # (200, 64, 64, 3)
 print("y.shape :", y.shape)   # (200, 2)
+
+
+
+
 
 # numpy로 최종 저장
 np.save('./data/x_data.npy', x)
 np.save('./data/y_data.npy', y)
+
+
+
+
+from PIL import Image
+import numpy as np
+import glob
+
+# 최종 예측 위한 데이터 준비
+testimg_dir = './img/test/'
+image_w = 100
+image_h = 100
+
+x_pred = []
+imgname = []
+
+testimg = glob.glob(testimg_dir + '*.jpg')
+
+print(testimg)
+
+
+
+for i, f in enumerate(testimg) :
+    image = Image.open(f)
+    image = image.convert("RGB")
+    image = image.resize((image_w, image_h))
+    image.save ('{}{}{}'.format('./eyes/test/test', i+1, '.jpg'))
+    data = np.asarray(image, dtype = 'float32')
+    print(data)
+    imgname.append(image)
+    x_pred.append(data)
+
+
+
+x_pred = np.array(x_pred)
+
+
+np.save('./data/x_pred.npy', arr = x_pred)
