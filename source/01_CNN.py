@@ -12,12 +12,8 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard
 x = np.load('./data/x_data.npy')
 y = np.load('./data/y_data.npy')
 
-x_pred = np.load('./data/x_pred.npy')
-
-
 print("x.shape :", x.shape)
 print("y.shape :", y.shape)
-
 
 x_train, x_test, y_train, y_test = train_test_split(
     x, y, test_size = 0.2, random_state = 77, shuffle = True
@@ -27,7 +23,6 @@ print("x_train.shape :", x_train.shape)  # (160, 64, 64, 3)
 print("x_test.shape :", x_test.shape)    # (40, 64, 64, 3)
 print("y_train.shape :", y_train.shape)  # (160, 2)
 print("y_test.shape :", y_test.shape)    # (40, 2)
-
 
 
 
@@ -46,12 +41,6 @@ x_test = scaler.transform(x_test)
 # CNN 모델에 맞게 Reshape
 x_train = x_train.reshape(x_train.shape[0], 64, 64, 3)
 x_test = x_test.reshape(x_test.shape[0], 64, 64, 3)
-
-
-
-
-
-
 
 
 
@@ -84,9 +73,6 @@ model.add(Dense(8))
 model.add(Dense(2, activation = 'sigmoid'))
 
 model.summary()
-
-
-
 
 # 3. 컴파일, 훈련
 # es = EarlyStopping(monitor = 'val_loss', patience = 10, mode = 'auto')

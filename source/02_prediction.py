@@ -51,7 +51,6 @@ print()
 
 
 
-
 cnt = 0
 for i in prediction :
     result = i.argmax()
