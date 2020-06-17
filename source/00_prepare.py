@@ -103,31 +103,9 @@ for index, categorie in enumerate(categories) :
 x = np.array(x)
 y = np.array(y)
 
-
-# # x_pred data 
-# x_pred = []
-
-# groups_folder_path = './data/test_face/'     
-
-# image_dir = groups_folder_path +  '/'
-# for path, dirs, files in os.walk(image_dir) :
-#     for filename in files :
-#         print(image_dir + filename)
-#         img = cv2.imread(image_dir+filename)
-#         x_pred.append(img)
-#         # print(x_pred)
-
-# x_pred = np.array(x_pred)
-
 # 64 x 64
 print("x.shape :", x.shape)   # (200, 64, 64, 3)
 print("y.shape :", y.shape)   # (200, 2)
-
-# 100 x 100 
-# print("x.shape :", x.shape)   # (200, 100, 100, 3)
-# print("y.shape :", y.shape)   # (200, 2)
-
-
 
 # numpy로 최종 저장
 np.save('./data/x_data.npy', x)
