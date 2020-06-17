@@ -1,12 +1,11 @@
 from PIL import Image
 import glob
 from natsort import natsorted
+import numpy as np
 import os
 import cv2
-import numpy as np
 
-# 1. 이미지 리사이즈
-
+# 1. image resize
 # closed eyes resize
 close_list = []    
 resized_close = []  
@@ -17,12 +16,24 @@ for filename in natsorted(glob.glob('./img/close/*.jpg')) :
     close_list.append(imc)    
 # append resized images to list
 for imc in close_list :       
-    imc = imc.resize((100, 100))
+    imc = imc.resize((64, 64))
     resized_close.append(imc)  
     print('size : {}'.format(imc.size))
 # save resized images to new folder
 for (i, new) in enumerate(resized_close) :
     new.save ('{}{}{}'.format('./eyes/close/ce', i+1, '.jpg')) 
+
+
+
+
+
+
+
+
+
+
+
+
 
 # open eyes resize
 open_list = []
@@ -34,7 +45,7 @@ for filename in natsorted(glob.glob('./img/open/*.jpg')) :
     open_list.append(imo)
 
 for imo in open_list :
-    imo = imo.resize((100, 100))
+    imo = imo.resize((64, 64))
     resized_open.append(imo)
     # print('size : {}'.format(imo.size))
 
@@ -42,7 +53,16 @@ for (i, new) in enumerate(resized_open) :
     new.save ('{}{}{}'.format('./eyes/open/oe', i+1, '.jpg'))
 
 
-# 2. 이미지 
+
+
+
+
+
+
+
+
+
+# 2. 이미지 dataset 만들기
 groups_folder_path = './eyes/'     
 categories = ["close", "open"]  
 num_classes = len(categories)
@@ -63,55 +83,14 @@ for index, categorie in enumerate(categories) :
             x.append(img)
             y.append(label)
 
-
 x = np.array(x)
 y = np.array(y)
 
 print("x.shape :", x.shape)   # (200, 64, 64, 3)
 print("y.shape :", y.shape)   # (200, 2)
 
-
-
-
-
 # numpy로 최종 저장
 np.save('./data/x_data.npy', x)
 np.save('./data/y_data.npy', y)
 
 
-
-
-from PIL import Image
-import numpy as np
-import glob
-
-# 최종 예측 위한 데이터 준비
-testimg_dir = './img/test/'
-image_w = 100
-image_h = 100
-
-x_pred = []
-imgname = []
-
-testimg = glob.glob(testimg_dir + '*.jpg')
-
-print(testimg)
-
-
-
-for i, f in enumerate(testimg) :
-    image = Image.open(f)
-    image = image.convert("RGB")
-    image = image.resize((image_w, image_h))
-    image.save ('{}{}{}'.format('./eyes/test/test', i+1, '.jpg'))
-    data = np.asarray(image, dtype = 'float32')
-    print(data)
-    imgname.append(image)
-    x_pred.append(data)
-
-
-
-x_pred = np.array(x_pred)
-
-
-np.save('./data/x_pred.npy', arr = x_pred)

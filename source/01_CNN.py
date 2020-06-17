@@ -19,7 +19,6 @@ print("x.shape :", x.shape)
 print("y.shape :", y.shape)
 
 
-from sklearn.model_selection import train_test_split
 x_train, x_test, y_train, y_test = train_test_split(
     x, y, test_size = 0.2, random_state = 77, shuffle = True
 )
@@ -32,9 +31,11 @@ print("y_test.shape :", y_test.shape)    # (40, 2)
 
 
 
-# Scaling 하기 위해 Reshape
-x_train = x_train.reshape(x_train.shape[0], 100*100*3)
-x_test = x_test.reshape(x_test.shape[0], 100*100*3)
+
+
+# Scaler 사용하기 위해 Reshape
+x_train = x_train.reshape(x_train.shape[0], 64*64*3)
+x_test = x_test.reshape(x_test.shape[0], 64*64*3)
 
 # MinMaxScaler
 scaler = MinMaxScaler()
@@ -43,30 +44,36 @@ x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
 
 # CNN 모델에 맞게 Reshape
-x_train = x_train.reshape(x_train.shape[0], 100, 100, 3)
-x_test = x_test.reshape(x_test.shape[0], 100, 100, 3)
+x_train = x_train.reshape(x_train.shape[0], 64, 64, 3)
+x_test = x_test.reshape(x_test.shape[0], 64, 64, 3)
+
+
+
+
+
+
+
 
 
 # 2. 모델 구성
 
 model = Sequential()
 
-#1
-model.add(Conv2D(64, (2, 2), activation = 'relu', input_shape = (100, 100, 3))) 
+model.add(Conv2D(32, (2, 2), activation = 'relu', input_shape = (64, 64, 3))) 
 model.add(MaxPooling2D(pool_size = 2))
 model.add(Dropout(0.25))
-#2
+
+model.add(Conv2D(64, (2, 2)))
+model.add(MaxPooling2D(pool_size = 2))
+model.add(Dropout(0.25))
+
 model.add(Conv2D(128, (2, 2)))
 model.add(MaxPooling2D(pool_size = 2))
-model.add(Dropout(0.5))
-#3
-model.add(Conv2D(512, (2, 2)))
-model.add(MaxPooling2D(pool_size = 2))
-model.add(Dropout(0.5))
-#4
+model.add(Dropout(0.25))
+
 model.add(Flatten())
 model.add(Dense(256))
-model.add(Dropout(0.25))
+model.add(Dropout(0.5))
 model.add(Dense(64))
 model.add(Dropout(0.25))
 model.add(Dense(32))
@@ -76,43 +83,35 @@ model.add(Dropout(0.1))
 model.add(Dense(8))
 model.add(Dense(2, activation = 'sigmoid'))
 
-
 model.summary()
+
+
 
 
 # 3. 컴파일, 훈련
 # es = EarlyStopping(monitor = 'val_loss', patience = 10, mode = 'auto')
+
 modelpath = './check/check--{epoch:02d}--{val_loss:.4f}.hdf5'
+
 cp = ModelCheckpoint(filepath = modelpath, monitor = 'val_loss', save_best_only = True, mode = 'auto')
-# tb_hist = TensorBoard(log_dir = 'graph', histogram_freq = 0, write_graph = True, write_images = True)
 
 model.compile(loss = 'binary_crossentropy', optimizer = 'adam', metrics = ['acc'])
 
-hist = model.fit(x_train, y_train, epochs = 100, batch_size = 32, validation_split = 0.3, verbose = 1)
+hist = model.fit(x_train, y_train, epochs = 50, batch_size = 32, validation_split = 0.3, verbose = 1, callbacks = [cp])
 
-# hist = model.fit(x_train, y_train, epochs = 50, batch_size = 32, validation_split = 0.3, verbose = 1, callbacks = [cp])
-                                  
+
+
+
+
+
+
+
 
 
 # 4. 평가, 예측
 loss, acc = model.evaluate(x_test, y_test, batch_size = 32)
 print("LOSS :", loss)
 print("ACC :", acc)
-
-
-prediction = model.predict(x_pred)
-prediction = np.argmax(prediction, axis = 1)
-
-
-for i in prediction :
-    if i == 0 :
-        print("눈을 감고 있습니다zZ")
-        print("-------------------")
-    else :
-        print("눈빛이 살아 있습니다")
-        print("-------------------")
-
-
 
 # 시각화
 
@@ -138,3 +137,27 @@ plt.legend(['Training acc', 'Val acc'], loc = 'upper left')
 
 plt.show()
 
+
+
+
+
+
+
+
+'''
+b50
+LOSS : 0.7065375208854675
+ACC : 0.7749999761581421
+'''
+
+'''
+b32
+LOSS : 0.5462690591812134
+ACC : 0.762499988079071
+'''
+
+'''
+b50
+LOSS : 0.6000218272209168
+ACC : 0.800000011920929
+'''

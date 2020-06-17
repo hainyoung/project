@@ -1,0 +1,294 @@
+정리
+
+
+00 Prepare : 데이터 준비
+from PIL import Image
+import glob
+from natsort import natsorted
+
+import numpy as np
+
+# 1. image resize
+# closed eyes resize
+close_list = []    
+resized_close = []  
+# append images to list
+for filename in natsorted(glob.glob('./img/close/*.jpg')) :
+    print(filename) 
+    imc = Image.open(filename) 
+    close_list.append(imc)    
+# append resized images to list
+for imc in close_list :       
+    imc = imc.resize((100, 100))
+    resized_close.append(imc)  
+    print('size : {}'.format(imc.size))
+# save resized images to new folder
+for (i, new) in enumerate(resized_close) :
+    new.save ('{}{}{}'.format('./eyes/close/ce', i+1, '.jpg')) 
+
+# open eyes resize
+open_list = []
+resized_open = []
+
+for filename in natsorted(glob.glob('./img/open/*.jpg')) :
+    # print(filename)
+    imo = Image.open(filename)
+    open_list.append(imo)
+
+for imo in open_list :
+    imo = imo.resize((100, 100))
+    resized_open.append(imo)
+    # print('size : {}'.format(imo.size))
+
+for (i, new) in enumerate(resized_open) :
+    new.save ('{}{}{}'.format('./eyes/open/oe', i+1, '.jpg'))
+
+
+# 2. 이미지 데이터화
+groups_folder_path = './eyes/'     
+categories = ["close", "open"]  
+num_classes = len(categories)
+print(num_classes) # 2
+
+x = []
+y = []
+
+import os
+import cv2
+
+for index, categorie in enumerate(categories) :
+    label = [0 for i in range(num_classes)]
+    label[index] = 1
+    image_dir = groups_folder_path + categorie + '/'
+
+    for path, dirs, files in os.walk(image_dir) :
+        for filename in files :
+            print(image_dir + filename)
+            img = cv2.imread(image_dir+filename)
+            x.append(img)
+            y.append(label)
+
+
+x = np.array(x)
+y = np.array(y)
+
+print("x.shape :", x.shape)   # (200, 64, 64, 3)
+print("y.shape :", y.shape)   # (200, 2)
+
+
+# numpy로 최종 저장
+np.save('./data/x_data.npy', x)
+np.save('./data/y_data.npy', y)
+
+
+
+
+01 CNN : 모델 구성
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler
+
+from keras.models import Sequential, Model
+from keras.layers import Input, Conv2D, MaxPooling2D, Flatten, Dense, Dropout
+
+from keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard
+
+x = np.load('./data/x_data.npy')
+y = np.load('./data/y_data.npy')
+
+x_pred = np.load('./data/x_pred.npy')
+
+
+print("x.shape :", x.shape)
+print("y.shape :", y.shape)
+
+
+from sklearn.model_selection import train_test_split
+x_train, x_test, y_train, y_test = train_test_split(
+    x, y, test_size = 0.2, random_state = 77, shuffle = True
+)
+
+print("x_train.shape :", x_train.shape)  # (160, 64, 64, 3)
+print("x_test.shape :", x_test.shape)    # (40, 64, 64, 3)
+print("y_train.shape :", y_train.shape)  # (160, 2)
+print("y_test.shape :", y_test.shape)    # (40, 2)
+
+
+
+
+# Scaling 하기 위해 Reshape
+x_train = x_train.reshape(x_train.shape[0], 100*100*3)
+x_test = x_test.reshape(x_test.shape[0], 100*100*3)
+
+# MinMaxScaler
+scaler = MinMaxScaler()
+scaler.fit(x_train)
+x_train = scaler.transform(x_train)
+x_test = scaler.transform(x_test)
+
+# CNN 모델에 맞게 Reshape
+x_train = x_train.reshape(x_train.shape[0], 100, 100, 3)
+x_test = x_test.reshape(x_test.shape[0], 100, 100, 3)
+
+
+# 2. 모델 구성
+
+model = Sequential()
+
+#1
+model.add(Conv2D(64, (2, 2), activation = 'relu', input_shape = (100, 100, 3))) 
+model.add(MaxPooling2D(pool_size = 2))
+model.add(Dropout(0.25))
+#2
+model.add(Conv2D(128, (2, 2)))
+model.add(MaxPooling2D(pool_size = 2))
+model.add(Dropout(0.5))
+#3
+model.add(Conv2D(512, (2, 2)))
+model.add(MaxPooling2D(pool_size = 2))
+model.add(Dropout(0.5))
+#4
+model.add(Flatten())
+model.add(Dense(256))
+model.add(Dropout(0.25))
+model.add(Dense(64))
+model.add(Dropout(0.25))
+model.add(Dense(32))
+model.add(Dropout(0.1))
+model.add(Dense(16))
+model.add(Dropout(0.1))
+model.add(Dense(8))
+model.add(Dense(2, activation = 'sigmoid'))
+
+
+model.summary()
+
+
+# 3. 컴파일, 훈련
+# es = EarlyStopping(monitor = 'val_loss', patience = 10, mode = 'auto')
+modelpath = './check/check--{epoch:02d}--{val_loss:.4f}.hdf5'
+cp = ModelCheckpoint(filepath = modelpath, monitor = 'val_loss', save_best_only = True, mode = 'auto')
+# tb_hist = TensorBoard(log_dir = 'graph', histogram_freq = 0, write_graph = True, write_images = True)
+
+model.compile(loss = 'binary_crossentropy', optimizer = 'adam', metrics = ['acc'])
+
+hist = model.fit(x_train, y_train, epochs = 100, batch_size = 32, validation_split = 0.3, verbose = 1)
+
+# hist = model.fit(x_train, y_train, epochs = 50, batch_size = 32, validation_split = 0.3, verbose = 1, callbacks = [cp])
+                                  
+
+
+# 4. 평가, 예측
+loss, acc = model.evaluate(x_test, y_test, batch_size = 32)
+print("LOSS :", loss)
+print("ACC :", acc)
+
+prediction = model.predict(x_pred)
+prediction = np.argmax(prediction, axis = 1)
+
+
+# for i in prediction :
+#     if i == 0 :
+#         print("눈을 감고 있습니다zZ")
+#         print("-------------------")
+#     else :
+#         print("눈빛이 살아 있습니다")
+#         print("-------------------")
+
+
+
+# 시각화
+
+plt.figure(figsize = (12, 10))
+
+plt.subplot(2, 1, 1)
+plt.plot(hist.history['loss'], marker = 'o', c = 'red', label = 'loss')
+plt.plot(hist.history['val_loss'], marker = 'o', c = 'blue', label = 'val_loss')
+plt.grid()
+plt.title('Training and Val loss')
+plt.ylabel('loss')
+plt.xlabel('epoch')
+plt.legend(['Training loss', 'Val loss'], loc = 'upper right')
+
+plt.subplot(2, 1, 2)
+plt.plot(hist.history['acc'], marker = 'o', c = 'purple', label = 'acc' )
+plt.plot(hist.history['val_acc'], marker = 'o', c = 'green', label = 'val_loss')
+plt.grid()
+plt.title('Training and Val accuracy')
+plt.ylabel('acc')
+plt.xlabel('epoch')
+plt.legend(['Training acc', 'Val acc'], loc = 'upper left')
+
+plt.show()
+
+
+
+02 Prediction : 최종 예측
+from PIL import Image
+import numpy as np
+import glob
+from keras.models import load_model
+
+# 최종 예측 위한 데이터 준비
+testimg_dir = './img/test/'
+image_w = 64
+image_h = 64
+
+x_pred = []
+imgname = []
+
+testimg = glob.glob(testimg_dir + '*.jpg')
+
+print(testimg)
+
+for i, f in enumerate(testimg) :
+    image = Image.open(f)
+    image = image.convert("RGB")
+    image = image.resize((image_w, image_h))
+    image.save ('{}{}{}'.format('./eyes/test/test', i+1, '.jpg'))
+    data = np.asarray(image, dtype = 'float32')
+    print(data)
+    imgname.append(image)
+    x_pred.append(data)
+
+# print(testimg)
+
+x_pred = np.array(x_pred)
+
+# np.save('./data/x_pred.npy', arr = x_pred)
+# x_pred = np.load('./data/x_pred.npy')
+
+# 저장한 모델 사용
+model = load_model('./check/save/check--31--0.1091.hdf5')
+
+
+# 최종 예측
+prediction = model.predict(x_pred)
+# prediction = np.argmax(prediction, axis = 1)
+
+# print(prediction)
+
+# import tensorflow as tf
+# np.set_printoptions(formatter={'float' : lambda x:"{0.03f}}".format(x)})
+
+
+cnt = 0
+
+for i in prediction :
+    result = i.argmax()
+    result_str = ""
+    if result == 0 : result_str = "눈을 감고 있는 사진"
+    else : result_str = "눈을 뜨고 있는 사진"
+
+    if i [0] >= 0.8 : print("파일명 " + testimg[cnt].split("\\")[1] + " : 이것은 " + result_str + "으로 보입니다.")
+    if i [1] >= 0.8 : print("파일명 " + testimg[cnt].split("\\")[1] + " : 이것은 " + result_str + "으로 보입니다.")
+    cnt += 1
+
+# split("\\") : \ 기호를 기준으로 문자열을 나눠준다
+# print(testimg[0]) = ./img/test\c1.jpg
+#                          [0]   [1]
+# split("\\")[0] = ./img/test
+# split("\\")[1] = c1.jpg
