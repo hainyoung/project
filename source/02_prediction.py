@@ -38,8 +38,8 @@ for i in prediction :
     if result == 0 : result_str = "눈을 감고 있는 사진"
     else : result_str = "눈을 뜨고 있는 사진"
 
-    if i [0] >= 0.8 : print("파일명 " + testimg[cnt].split("\\")[1] + " : 이것은 " + result_str + "으로 보입니다.")
-    if i [1] >= 0.8 : print("파일명 " + testimg[cnt].split("\\")[1] + " : 이것은 " + result_str + "으로 보입니다.")
+    if i [0] == 1.0 : print("파일명 " + testimg[cnt].split("\\")[1] + " : 이것은 " + result_str + "으로 보입니다.")
+    if i [1] == 1.0 : print("파일명 " + testimg[cnt].split("\\")[1] + " : 이것은 " + result_str + "으로 보입니다.")
     cnt += 1
 
 

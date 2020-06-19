@@ -43,7 +43,6 @@ for imo in open_list :
 for (i, new) in enumerate(resized_open) :
     new.save ('{}{}{}'.format('./eyes/open/oe', i+1, '.jpg'))
 
-
 # 2. 이미지 dataset 만들기
 groups_folder_path = './eyes/'     
 categories = ["close", "open"]  
@@ -53,33 +52,34 @@ print(num_classes) # 2
 x = []
 y = []
 
-
 for index, categorie in enumerate(categories) :
+    print(index, categorie)
+
     label = [0 for i in range(num_classes)]
     print(label)
+    print(type(label))
     label[index] = 1
+    print(label[index])
     image_dir = groups_folder_path + categorie + '/'
 
-    for path, dirs, files in os.walk(image_dir) :
-        for filename in files :
-            # print(filename)
-            print(image_dir + filename)
-            img = cv2.imread(image_dir+filename)
-            x.append(img)
-            y.append(label)
+    files = glob.glob(image_dir +  "*.jpg")
+    for img, filename in enumerate(files):
+        img = Image.open(filename)
+        img = img.convert("RGB")
+        data = np.asarray(img)
+        x.append(data)
+        y.append(label)
 
-
-
-'''
 x = np.array(x)
 y = np.array(y)
 
+print(y)
+'''
 print("x.shape :", x.shape)   # (200, 64, 64, 3)
 print("y.shape :", y.shape)   # (200, 2)
 
 # numpy로 최종 저장
 np.save('./data/x_data.npy', x)
 np.save('./data/y_data.npy', y)
-
 
 '''
