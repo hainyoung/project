@@ -1,0 +1,51 @@
+# 물체 추적, Object tracking 사용하여 사람을 따라다니는 직캠 만들기
+# https://www.youtube.com/watch?v=cx7VONjFEE0
+
+# pip install numpy
+# pip install opencv-python
+# pip install opencv-contrib-python
+
+import cv2
+import numpy as np
+
+# 사용할 동영상 다운로드 필요
+
+# video load
+video_paht = '경로.확장자명'
+cap = cv2.VideoCapture(video_path) # 비디오를 읽는 함수, 동영상을 로드한다
+# 동영상을 읽어서 윈도우에 띄워봄
+
+if not cap.isOpend() : # cap.isOpened() 동영상이 제대로 로드 되면 True를 반환
+    exit() # 제대로 load 되지 않으면 Python 프로그램을 종료함
+
+
+# 첫 번째 프레임에서 ROI를 설정
+
+ret, img = cap.read() # 첫 번째 프레임을 읽어옴
+cv2.nameWindow('Select Window') # 윈도우에 띄우는데 윈도우의 이름을 설정해준다(ROI를 세팅할)
+cv2.imshow('Select Window', img)
+
+
+while True :
+    ret, img = cap.read() # 동영상을 1프레임씩 읽어온다 -> img 라는 변수에 저장
+
+    if not ret :
+        exit() # 재생이 모두 끝나면 프로그램 종료
+    
+    cv2.imshow('img', img)
+    # cv2.waitKey(1) # cv2.waitKey(n) : 키 입력을 n밀리세컨드간 기다린다
+    # 위 대신
+    if cv2.waitKey(1) == ord('q') : # ord('q') 무자 q에 해당하는 아스키 코드를 int로 반환함
+        break
+    # q를 누르게 되면 바로 while문을 빠져 나오도록 작성함
+
+
+# 커맨드 창에서 python main.py (파일명) 입력 -> 프로그램 실행
+
+# object 를 tracking할 때, 어떤 object를 쫄아갈 건지 지정해야함
+# ROI : Region of Interest, 관심 영역
+# 영상처리 할 때 쓰는 보편적인 용어
+# 사용자가 관심 있는 부분! 을 지정 : ROI를 세팅한다
+# openCV에서 제공해준다
+
+
