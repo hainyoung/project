@@ -10,8 +10,8 @@ import matplotlib.patches as patches
 import matplotlib.patheffects as path_effects
 
 detector = dlib.get_frontal_face_detector()
-sp = dlib.shape_predictor('./team/models/shape_predictor_68_face_landmarks.dat')
-facerec = dlib.face_recognition_model_v1('./team/models/dlib_face_recognition_resnet_model_v1.dat')
+sp = dlib.shape_predictor('./face_detection/models/shape_predictor_68_face_landmarks.dat')
+facerec = dlib.face_recognition_model_v1('./face_detection/models/dlib_face_recognition_resnet_model_v1.dat')
 
 # 얼굴을 찾는 함수
 def find_faces(img):
@@ -47,10 +47,10 @@ def encode_faces(img, shapes) :
 
 
 img_paths = {
-    'neo' : './team/img/neo.jpg',
-    'trinity' : './team/img/trinity.jpg',
-    'morpheus' : './team/img/morpheus.jpg',
-    'smith' : './team/img/smith.jpg'
+    'neo' : './face_detection/img/neo.jpg',
+    'trinity' : './face_detection/img/trinity.jpg',
+    'morpheus' : './face_detection/img/morpheus.jpg',
+    'smith' : './face_detection/img/smith.jpg'
 }
 
 # 계산한 결과를 저장할 변수
@@ -68,13 +68,13 @@ for name, img_path in img_paths.items() :
     _, img_shapes, _ = find_faces(img_rgb) # RGB 체계로 바꾼 이미지의 랜드마크들을 가져온다(img_shapes 변수에 담음)
     descs[name] = encode_faces(img_rgb, img_shapes)[0] # 인코딩된 결과를 각 사람의 이름에 맞게 저장해준다
 
-np.save('./team/img/descs.npy', descs)
+np.save('./face_detection/img/descs.npy', descs)
 
 print(descs)
 
 
 # Compute Input
-img_bgr = cv2.imread('./team/img/matrix5.jpg')
+img_bgr = cv2.imread('./face_detection/img/matrix5.jpg')
 img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
 
 rects, shapes, _ = find_faces(img_rgb)
