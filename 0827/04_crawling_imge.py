@@ -29,6 +29,68 @@ print(paths)   #printing absolute paths of the downloaded images
 # pip install git+https://github.com/Joeclinton1/google-images-download.git
 
 # 키워드당 최대 100개의 사진까지 다운로드
+# 아래 코드는 google-images-download 디렉토리에 넣어두고 실행해야 한다
 
-# from google_imgages_download import google_images_download
+# from google_images_download import google_images_download
 
+# response = google_images_download()
+
+# arguments = {"keywords":"Polar bears, baloons, Beaches", "limit":20, "print_urls":True}
+# paths = response.download(arguments)
+# print(paths)
+
+# 해 봤는데 안 됨
+# importerror 발생 -> 추후 수정 해 보고 다른 방법 찾자
+
+# 네이버 이미지 크롤링
+
+# from urllib.request import urlopen
+# from bs4 import BeautifulSoup as bs
+# from urllib.parse import quote_plus
+
+# baseUrl = 'https://search.naver.com/search.naver?where=image&sm=tab_jum&query='
+# plusUrl = input('검색어를 입력하세요 : ')
+# url = baseUrl + quote_plus(plusUrl)
+
+# html = urlopen(url).read()
+# soup = bs(html, "html.parser")
+# # img = soup.find_all(class_='_img')
+# img = soup.find_all("a", limit = 2) # 개수 제한
+
+# print(img[0])
+
+# n = 1
+# for i in img:
+#     imgUrl = i['data-source']
+#     with urlopen(imgUrl) as f:
+#         with open(plusUrl+str(n) + '.jpg', 'wb') as h:
+#             img = f.read()
+#             h.write(img)
+#     n += 1
+
+# print('다운로드완료')
+
+from urllib.request import urlopen
+from bs4 import BeautifulSoup as bs
+from urllib.parse import quote_plus
+
+baseUrl = 'https://search.naver.com/search.naver?where=image&sm=tab_jum&query='
+plusUrl = input('검색어를 입력하세요 : ')
+url = baseUrl + quote_plus(plusUrl)
+
+html = urlopen(url).read()
+soup = bs(html, "html.parser")
+img = soup.find_all(class_='_img')
+
+print(img[0])
+
+n = 1
+for i in img:
+    imgUrl = i['data-source']
+    with urlopen(imgUrl) as f:
+        with open(plusUrl+str(n) + '.jpg', 'wb') as h:
+            img = f.read()
+            h.write(img)
+    n += 1
+
+print('다운로드완료')
