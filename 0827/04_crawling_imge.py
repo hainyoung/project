@@ -76,6 +76,8 @@ from urllib.parse import quote_plus
 
 baseUrl = 'https://search.naver.com/search.naver?where=image&sm=tab_jum&query=' 
 plusUrl = input('검색어를 입력하세요 : ') # query 뒤에 오는, 크롤링할 이미지 대상의 이름을 기입
+
+# 한글 검색 자동 변환?
 url = baseUrl + quote_plus(plusUrl) 
 # 최종으로 크롤링할 url
 # quote_plus() : URL로 이동하기 위한 쿼리 문자열을 만들 때 HTMl 폼값을 인용하는 데 필요한 대로 스페이스를 더하기 부호로 치환하기도 합니다. 
@@ -122,4 +124,78 @@ for i in img:
     n += 1
 
 print("다운로드 완료")
+'''
+
+
+
+'''
+크롤링 결과 검색어명 폴더에 자동 저장
+
+from urllib.request import urlopen
+from bs4 import BeautifulSoup as bs
+from urllib.parse import quote_plus
+import os
+
+baseUrl = 'https://search.naver.com/search.naver?where=image&sm=tab_jum&query='
+plusUrl = input('검색어를 입력하세요 : ')
+# 한글 검색 자동 변환
+url = baseUrl + quote_plus(plusUrl)
+html = urlopen(url)
+soup = bs(html, "html.parser")
+img = soup.find_all(class_='_img')
+
+#폴더를 검색어로 생성
+dir_path = './img/'
+dir_name = plusUrl
+os.mkdir(dir_path + "/" + dir_name + "/")
+path = dir_path + '/' + dir_name + '/'
+n = 1
+for i in img:
+imgUrl = i['data-source']
+with urlopen(imgUrl) as f:
+with open(path +plusUrl+str(n)+'.jpg','wb') as h: # w - write b - binary
+img = f.read()
+h.write(img)
+n += 1
+print('다운로드 완료')
+'''
+
+
+
+'''
+# 여러 페이지 크롤링
+
+import urllib.request
+from bs4 import BeautifulSoup
+
+#접근할 페이지 번호
+pageNum = 1
+
+#저장할 이미지 경로 및 이름 (data폴더에 face0.jpg 형식으로 저장)
+imageNum = 0
+imageStr = "data/face"
+
+while pageNum < 3:
+    url = "https://www.kr.playblackdesert.com/BeautyAlbum?searchType=0&searchText=&categoryCode=0&classType=0,4,8,12,16,20,21,24,25,26,28,31,27,19,23,11,29,17,5&Page="
+    url = url + str(pageNum)
+    
+    fp = urllib.request.urlopen(url)
+    source = fp.read();
+    fp.close()
+
+    soup = BeautifulSoup(source, 'html.parser')
+    soup = soup.findAll("p",class_ = "img_area")
+
+    #이미지 경로를 받아 로컬에 저장한다.
+    for i in soup:
+        imageNum += 1
+        imgURL = i.find("img")["src"]
+        urllib.request.urlretrieve(imgURL,imageStr + str(imageNum) + ".jpg")
+        print(imgURL)
+        print(imageNum)
+
+    pageNum += 1
+[출처] [python]웹사이트의 대량의 이미지 크롤링하기(2) / 파이썬 웹 크롤러|작성자 유알
+
+
 '''
