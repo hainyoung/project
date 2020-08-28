@@ -74,23 +74,52 @@ from urllib.request import urlopen
 from bs4 import BeautifulSoup as bs
 from urllib.parse import quote_plus
 
-baseUrl = 'https://search.naver.com/search.naver?where=image&sm=tab_jum&query='
-plusUrl = input('검색어를 입력하세요 : ')
-url = baseUrl + quote_plus(plusUrl)
+baseUrl = 'https://search.naver.com/search.naver?where=image&sm=tab_jum&query=' 
+plusUrl = input('검색어를 입력하세요 : ') # query 뒤에 오는, 크롤링할 이미지 대상의 이름을 기입
+url = baseUrl + quote_plus(plusUrl) 
+# 최종으로 크롤링할 url
+# quote_plus() : URL로 이동하기 위한 쿼리 문자열을 만들 때 HTMl 폼값을 인용하는 데 필요한 대로 스페이스를 더하기 부호로 치환하기도 합니다. 
+# safe에 포함되지 않으면 원래 문자열의 더하기 부호가 이스케이프 됩니다. 또한 safe의 기본값은 '/'가 아닙니다.
+# 예: quote_plus('/El Niño/')는 '%2FEl+Ni%C3%B1o%2F'를 산출합니다.
 
 html = urlopen(url).read()
-soup = bs(html, "html.parser")
-img = soup.find_all(class_='_img')
+soup = bs(html, "html.parser") # html parsing / html 구문 분석, soup 변수에 넣어둠
+img = soup.find_all(class_='_img') # soup에서 class가 image인 부분을 모두 가져옴
 
 print(img[0])
+
+'''
+image 를 가져올 수 있는 소스 확인
+
+검색어를 입력하세요 : 황사
+<img alt="3M 황사마스크 KF80 황사마스크 구입 | 블로그" class="_img" data-height="325" data-source="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2F20160122_135%2Fjhmungu_1453445435689KNBJ1_JPEG%2Fhuffpost_com_20160122_154930.jpg&amp;type=b400" data-width="650" onerror="var we=$Element(this); we.addClass('bg_nimg'); we.attr('alt','이미지준비중'); we.attr('src','data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7');" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"/>
+PS D:\miniproject> 
+
+'''
+
+# data-source 부분이 이미지 주소에 해당
 
 n = 1
 for i in img:
     imgUrl = i['data-source']
-    with urlopen(imgUrl) as f:
-        with open(plusUrl+str(n) + '.jpg', 'wb') as h:
-            img = f.read()
+    with urlopen(imgUrl) as f: # f = urlopen(imgUrl)
+        with open(plusUrl+str(n) + '.jpg', 'wb') as h: # h = 이미지를 저장할 변수
+            img = f.read() # imgUrl 읽어옴 / class _img인 부분을 가져온 게 img, 
             h.write(img)
     n += 1
 
 print('다운로드완료')
+
+# 위의 with as 구문을 풀어쓰면 아래와 같다
+'''
+n = 1
+for i in img:
+    imgUrl = i['data-source']
+    f = urlopen(imgUrl)
+    h = open(plusUrl + str(n) + '.jpg', 'wb')
+    img = f.read()
+    h.write(img)
+    n += 1
+
+print("다운로드 완료")
+'''
