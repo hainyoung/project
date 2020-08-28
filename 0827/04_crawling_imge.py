@@ -158,6 +158,8 @@ import os
 # 사슴 - 윤아, 차은우
 # 토끼 - 수지, 도티
 
+'''
+# ver 2 : 검색어명 폴더 생성
 baseUrl = 'https://search.naver.com/search.naver?where=image&sm=tab_jum&query='
 plusUrl = input('검색어를 입력하세요 : ')
 # 한글 검색 자동 변환
@@ -180,12 +182,13 @@ for i in img:
             h.write(img)
             n += 1
             print('다운로드 완료')
+'''
 
 
 
 
 '''
-# 여러 페이지 크롤링
+# ver 3 : 여러 페이지 크롤링 - 무슨 특정 게임 캐릭터 이미지 사이트
 
 import urllib.request
 from bs4 import BeautifulSoup
@@ -219,5 +222,8 @@ while pageNum < 3:
     pageNum += 1
 [출처] [python]웹사이트의 대량의 이미지 크롤링하기(2) / 파이썬 웹 크롤러|작성자 유알
 
+'''
 
+'''
+# ver4 : 파이썬 여러 이밎
 '''
