@@ -149,43 +149,71 @@ from bs4 import BeautifulSoup as bs
 from urllib.parse import quote_plus
 import os
 
-# 고양이 - 안소희, 황민현 
-# 강아지 - 박보영, 송중기
-# 여우 - 이준기, 제시카
-# 호랑이 - 최민식, 나나
-# 돼지 - 정형돈, 이하늬
-# 공룡 - 김우빈, 신민아
-# 사슴 - 윤아, 차은우
-# 토끼 - 수지, 도티
+# 고양이 - 안소희, 시우민, 레드벨벳 슬기, 황민현
+# 강아지 - 박보영, 손예진, 박보검, 박형식
+# 공룡 - 김우빈, 신민아, 샤이니 종현, 장재인
+# 토끼 - 배수지, 전정국, 나연, 강찬희
 
-'''
+
 # ver 2 : 검색어명 폴더 생성
-baseUrl = 'https://search.naver.com/search.naver?where=image&sm=tab_jum&query='
-plusUrl = input('검색어를 입력하세요 : ')
-# 한글 검색 자동 변환
-url = baseUrl + quote_plus(plusUrl)
-html = urlopen(url)
-soup = bs(html, "html.parser")
-img = soup.find_all(class_='_img')
 
-#폴더를 검색어로 생성
-dir_path = './0827/image'
-dir_name = plusUrl
-os.mkdir(dir_path + "/" + dir_name + "/")
-path = dir_path + '/' + dir_name + '/'
-n = 1
-for i in img:
-    imgUrl = i['data-source']
-    with urlopen(imgUrl) as f:
-        with open(path +plusUrl+str(n)+'.jpg','wb') as h: # w - write b - binary
-            img = f.read()
-            h.write(img)
-            n += 1
-            print('다운로드 완료')
-'''
+# baseUrl = 'https://search.naver.com/search.naver?where=image&sm=tab_jum&query='
+# plusUrl = input('검색어를 입력하세요 : ')
+
+# # 한글 검색 자동 변환
+# url = baseUrl + quote_plus(plusUrl)
+# html = urlopen(url)
+# soup = bs(html, "html.parser")
+# img = soup.find_all(class_='_img')
+
+# #폴더를 검색어로 생성
+# dir_path = './0827/image'
+# dir_name = plusUrl
+# os.mkdir(dir_path + "/" + dir_name + "/")
+# path = dir_path + '/' + dir_name + '/'
+# n = 1
+# for i in img:
+#     imgUrl = i['data-source']
+#     with urlopen(imgUrl) as f:
+#         with open(path +plusUrl+str(n)+'.jpg','wb') as h: # w - write b - binary
+#             img = f.read()
+#             h.write(img)
+#             n += 1
+#             print('다운로드 완료')
+
+
+# 이름 리스트로 만들고 자동 호출해서 저장하는 코드 작성 시도
+
+stars = ['안소희', '시우민', '강슬기', '황민현', '박보영', '손예진', '박보검', '박형식', '김우빈', '신민아', '종현', '장재인', '배수지', '전정국', '나연', '강찬희']
 
 
 
+for plusUrl in stars:
+
+    baseUrl = 'https://search.naver.com/search.naver?where=image&sm=tab_jum&query='
+
+    # 한글 검색 자동 변환
+    url = baseUrl + quote_plus(plusUrl)
+    html = urlopen(url)
+    soup = bs(html, "html.parser")
+    img = soup.find_all(class_='_img')
+
+    # 폴더를 검색어로 생성
+    dir_path = './0827/image'
+    dir_name = plusUrl
+    os.mkdir(dir_path + "/" + dir_name + "/")
+    path = dir_path + '/' + dir_name + '/'
+    n = 1
+    for i in img:
+        imgUrl = i['data-source']
+        with urlopen(imgUrl) as f:
+            with open(path +plusUrl+str(n)+'.jpg','wb') as h: # w - write b - binary
+                img = f.read()
+                h.write(img)
+                n += 1
+                print('다운로드 완료')
+
+print("complete")
 
 '''
 # ver 3 : 여러 페이지 크롤링 - 무슨 특정 게임 캐릭터 이미지 사이트
