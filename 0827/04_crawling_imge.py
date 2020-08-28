@@ -77,7 +77,7 @@ import time
 import datetime
 
 
-
+'''
 baseUrl = 'https://search.naver.com/search.naver?where=image&sm=tab_jum&query=' 
 plusUrl = input('검색어를 입력하세요 : ') # query 뒤에 오는, 크롤링할 이미지 대상의 이름을 기입
 
@@ -97,6 +97,8 @@ img = soup.find_all(class_='_img') # soup에서 class가 image인 부분을 모�
 print(img[0])
 
 '''
+
+'''
 image 를 가져올 수 있는 소스 확인
 
 검색어를 입력하세요 : 황사
@@ -107,21 +109,21 @@ PS D:\miniproject>
 
 # data-source 부분이 이미지 주소에 해당
 
-n = 1
-for i in img:
-    imgUrl = i['data-source']
-    with urlopen(imgUrl) as f: # f = urlopen(imgUrl)
-        with open(plusUrl+str(n) + '.jpg', 'wb') as h: # h = 이미지를 저장할 변수
-            img = f.read() # imgUrl 읽어옴 / class _img인 부분을 가져온 게 img, 
-            h.write(img)
-    n += 1
+# n = 1
+# for i in img:
+#     imgUrl = i['data-source']
+#     with urlopen(imgUrl) as f: # f = urlopen(imgUrl)
+#         with open(plusUrl+str(n) + '.jpg', 'wb') as h: # h = 이미지를 저장할 변수
+#             img = f.read() # imgUrl 읽어옴 / class _img인 부분을 가져온 게 img, 
+#             h.write(img)
+#     n += 1
 
-print('다운로드완료')
+# print('다운로드완료')
 
-sec = time.time() - start
-times = str(datetime.timedelta(seconds=sec)).split(".")
-times = times[0]
-print(times)
+# sec = time.time() - start
+# times = str(datetime.timedelta(seconds=sec)).split(".")
+# times = times[0]
+# print(times)
 
 # 위의 with as 구문을 풀어쓰면 아래와 같다
 '''
@@ -139,13 +141,22 @@ print("다운로드 완료")
 
 
 
-'''
-크롤링 결과 검색어명 폴더에 자동 저장
+
+# 크롤링 결과 검색어명 폴더에 자동 저장
 
 from urllib.request import urlopen
 from bs4 import BeautifulSoup as bs
 from urllib.parse import quote_plus
 import os
+
+# 고양이 - 안소희, 황민현 
+# 강아지 - 박보영, 송중기
+# 여우 - 이준기, 제시카
+# 호랑이 - 최민식, 나나
+# 돼지 - 정형돈, 이하늬
+# 공룡 - 김우빈, 신민아
+# 사슴 - 윤아, 차은우
+# 토끼 - 수지, 도티
 
 baseUrl = 'https://search.naver.com/search.naver?where=image&sm=tab_jum&query='
 plusUrl = input('검색어를 입력하세요 : ')
@@ -156,20 +167,20 @@ soup = bs(html, "html.parser")
 img = soup.find_all(class_='_img')
 
 #폴더를 검색어로 생성
-dir_path = './img/'
+dir_path = './0827/image'
 dir_name = plusUrl
 os.mkdir(dir_path + "/" + dir_name + "/")
 path = dir_path + '/' + dir_name + '/'
 n = 1
 for i in img:
-imgUrl = i['data-source']
-with urlopen(imgUrl) as f:
-with open(path +plusUrl+str(n)+'.jpg','wb') as h: # w - write b - binary
-img = f.read()
-h.write(img)
-n += 1
-print('다운로드 완료')
-'''
+    imgUrl = i['data-source']
+    with urlopen(imgUrl) as f:
+        with open(path +plusUrl+str(n)+'.jpg','wb') as h: # w - write b - binary
+            img = f.read()
+            h.write(img)
+            n += 1
+            print('다운로드 완료')
+
 
 
 
