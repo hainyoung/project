@@ -73,9 +73,15 @@ print(paths)   #printing absolute paths of the downloaded images
 from urllib.request import urlopen
 from bs4 import BeautifulSoup as bs
 from urllib.parse import quote_plus
+import time
+import datetime
+
+
 
 baseUrl = 'https://search.naver.com/search.naver?where=image&sm=tab_jum&query=' 
 plusUrl = input('검색어를 입력하세요 : ') # query 뒤에 오는, 크롤링할 이미지 대상의 이름을 기입
+
+start = time.time()
 
 # 한글 검색 자동 변환?
 url = baseUrl + quote_plus(plusUrl) 
@@ -111,6 +117,11 @@ for i in img:
     n += 1
 
 print('다운로드완료')
+
+sec = time.time() - start
+times = str(datetime.timedelta(seconds=sec)).split(".")
+times = times[0]
+print(times)
 
 # 위의 with as 구문을 풀어쓰면 아래와 같다
 '''
