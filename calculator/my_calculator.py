@@ -192,6 +192,7 @@ def funcClick(key):
                       
 # create a window
 window = tk.Tk()
+window.mainloop()
 window.title("MyCalculator")
 
 # always on Top
